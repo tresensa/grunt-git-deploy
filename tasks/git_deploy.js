@@ -27,6 +27,7 @@ module.exports = function(grunt) {
     }
 
     var src = this.filesSrc[0];
+    var files = this.filesSrc.filter(function(f){ return file.isFile(f) }).map(function(f){ return path.relative(src, f)});
 
     if (!file.isDir(src)) {
       grunt.fail.warn('A source directory is needed.');
@@ -51,7 +52,7 @@ module.exports = function(grunt) {
     grunt.util.async.series([
       git(['init']),
       git(['checkout', '--orphan', options.branch]),
-      git(['add', '--all']),
+      git(['add'].concat(files.length ? files : ['--all'])),
       git(['commit', '--message="' + options.message + '"']),
       git(['push', '--prune', '--force', '--quiet', options.url, options.branch])
     ], done);
